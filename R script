@@ -1,0 +1,354 @@
+# BIO 261 ECOLOGICAL MODEL REPORT R SCRIPT
+#
+# 2-species predator-prey Lotka-Volterra model, Functional Response III
+#
+# in case you don’t have the solver library installed:
+install.packages("deSolve")
+# importing library
+require(deSolve)
+###############################################################################
+
+# Model 1: 
+
+# Definition of the model
+LV.type3 <- function(times, N0, params){
+  N0[N0 < 10^-8] <- 0
+  N1 <- N0[1]
+  N2 <- N0[2]
+  with(as.list(params), {
+    dN1.dt <- r1*N1-((alpha12*N1^h*N2)/(1+alpha12*th*N1^h))
+    dN2.dt <- ((alpha21*N1^h*N2)/(1+alpha12*th*N1^h))-d2*N2
+    return(list(c(dN1.dt, dN2.dt)))
+  })
+}
+# here we set the values of the parameters that the equations take
+params <- c(r1 = 0.8, d2 = 0.1, alpha12 = 0.6, alpha21 = 0.4, th = 0.01, 
+            h = 2)
+# initial conditions
+N0 <- c(50,5)
+# definition of time
+t.values <- seq(0, 50) # Change 50 to 10 to get the 10 year plot in figure 1.
+# Simulate the continuous time dynamics using the ode
+type3.out <- ode(N0, t.values, LV.type3, params)
+par(mfrow=c(1,1))
+matplot(type3.out[,c(2,3)], type = 'l', lty = 1, lwd = 2, 
+        ylab='Abudance (n)', xlab='Time (y)',
+        col = c('blue', 'red'))
+legend('topright', c('Prey', 'Predator'), lty = 1, lwd = 2, col = 
+         c('blue', 'red'))
+# Add a horizontal line at y = 2 - extinction threshold
+abline(h = 2, lty = 2)
+
+###############################################################################
+
+# Model 2: 
+
+# Definition of the model
+LV.type3 <- function(times, N0, params){
+  N0[N0 < 10^-8] <- 0
+  N1 <- N0[1]
+  N2 <- N0[2]
+  with(as.list(params), {
+    dN1.dt <- r1*N1*(1-N1/K1)-((alpha12*N1^h*N2)/(1+alpha12*th*N1^h))
+    dN2.dt <- (((alpha21*N1^h*N2)/(1+alpha12*th*N1^h))+r2*N2)*(1-N2/K2)
+    return(list(c(dN1.dt, dN2.dt)))
+  })
+}
+# here we set the values of the parameters that the equations take
+params <- c(r1 = 0.8, r2 = 0.1, alpha12 = 0.6, alpha21 = 0.4, th = 0.01, 
+            h = 2, K1 = 100, K2 = 40)
+# initial conditions
+N0 <- c(50,5)
+# definition of time
+t.values <- seq(0, 50) #Change 50 to 10 to get the 10 year plot in figure 2.
+# Simulate the continuous time dynamics using the ode
+type3.out <- ode(N0, t.values, LV.type3, params)
+par(mfrow=c(1,1))
+matplot(type3.out[,c(2,3)], type = 'l', lty = 1, lwd = 2, 
+        ylab='Abudance (n)', xlab='Time (y)',
+        col = c('blue', 'red'))
+legend('topright', c('Prey', 'Predator'), lty = 1, lwd = 2, col = 
+         c('blue', 'red'))
+# Add a horizontal line at y = 2 - extinction threshold
+abline(h = 2, lty = 2)
+
+###############################################################################
+
+# Model 3: 
+
+# Definition of the model
+LV.type3 <- function(times, N0, params){
+  N0[N0 < 10^-8] <- 0
+  N1 <- N0[1]
+  N2 <- N0[2]
+  with(as.list(params), {
+    dN1.dt <- r1*N1*(1-N1/K1)-((alpha12*N1^h*N2)/(1+alpha12*th*N1^h))+ri
+    dN2.dt <- ((((alpha21*N1^h*N2)/(1+alpha12*th*N1^h))+r2*N2)*(1-N2/K2))-rc
+    return(list(c(dN1.dt, dN2.dt)))
+  })
+}
+# here we set the values of the parameters 
+# Change the ri and rc parameters to create the grass in figure 7. and 8.
+params <- c(r1 = 0.8, r2 = 0.1, alpha12 = 0.6, alpha21 = 0.4, th = 0.01, 
+            h = 2, K1 = 100, K2 = 40, ri = 0, rc = 0)
+# initial conditions
+N0 <- c(50,5)
+# definition of time
+t.values <- seq(0, 50) #Change 50 to 10 to get the 10 year plot in figure 1.
+# Simulate the continuous time dynamics using the ode
+type3.out <- ode(N0, t.values, LV.type3, params)
+par(mfrow=c(1,1))
+matplot(type3.out[,c(2,3)], type = 'l', lty = 1, lwd = 2, 
+        ylab='Abudance (n)', xlab='Time (y)',
+        ylim = c(0, 100),
+        col = c('blue', 'red'))
+legend('topright', c('Prey', 'Predator'), lty = 1, lwd = 2, col = 
+         c('blue', 'red'))
+# Add a horizontal line at y = 2 - extinction threshold
+abline(h = 2, lty = 2)
+# Add text to specify ri and rc value
+text(5,98, "ri = 0")
+text(4.7,90, "rc = 0")
+
+###############################################################################
+# Phase plane plots 
+
+# model 1
+
+# Define the LV.type3 model function
+LV.type3 <- function(times, N0, params){
+  N0[N0 < 10^-8] <- 0
+  N1 <- N0[1]
+  N2 <- N0[2]
+  with(as.list(params), {
+    dN1.dt <- r1*N1-((alpha12*N1^h*N2)/(1+alpha12*th*N1^h))
+    dN2.dt <- ((alpha21*N1^h*N2)/(1+alpha12*th*N1^h))-d2*N2
+    return(list(c(dN1.dt, dN2.dt)))
+  })
+}
+
+# Parameters
+params <- c(r1 = 0.8, d2 = 0.1, alpha12 = 0.6, alpha21 = 0.4, th = 0.01, h = 2)
+
+# Initial conditions
+N0 <- c(50, 5)
+
+# Time definition
+t.values <- seq(0, 50)
+
+# Solve the LV.type3 model
+lv3_out <- ode(N0, t.values, LV.type3, params)
+
+# Plot phase plane for LV.type2
+plot(lv3_out[,2], lv3_out[,3], type = 'l', lty = 1, lwd = 2, 
+     xlab = 'Prey abundance', ylab = 'Predator abundance',
+     ylim = c(0, 40), 
+     main = 'Phase Plane', col = 'black')
+
+# Function to calculate prey isocline
+prey_isocline <- function(N1, params) {
+  with(as.list(params), {
+    return((r1 * N1) / (1 + alpha12 * th * N1^h))
+  })
+}
+
+# Function to calculate predator isocline
+predator_isocline <- function(N1, params) {
+  with(as.list(params), {
+    return((alpha21 * N1^h) / (d2 * (1 + alpha12 * th * N1^h)))
+  })
+}
+
+# Calculate isocline values
+prey_isocline_values <- prey_isocline(lv3_out[,2], params)
+predator_isocline_values <- predator_isocline(lv3_out[,2], params)
+
+# Add prey isocline to plot
+lines(lv3_out[,2], prey_isocline_values, col = 'blue', lty = 2)
+
+# Add predator isocline to plot
+lines(lv3_out[,2], predator_isocline_values, col = 'red', lty = 2)
+
+# Add legend for isoclines
+legend('topright', c('Prey Isocline', 'Predator Isocline'), 
+       lty = 2, lwd = 2, col = c('blue', 'red'))
+
+
+# model 2
+
+# Define the LV.type3 model function
+LV.type3 <- function(times, N0, params){
+  N0[N0 < 10^-8] <- 0
+  N1 <- N0[1]
+  N2 <- N0[2]
+  with(as.list(params), {
+    dN1.dt <- r1 * N1 * (1 - N1 / K1) - ((alpha12 * N1^h * N2) / (1 + alpha12 * th * N1^h))
+    dN2.dt <- (((alpha21 * N1^h * N2) / (1 + alpha12 * th * N1^h)) + r2 * N2) * (1 - N2 / K2)
+    return(list(c(dN1.dt, dN2.dt)))
+  })
+}
+
+# Parameters
+params <- c(r1 = 0.8, r2 = 0.1, alpha12 = 0.6, alpha21 = 0.4, th = 0.01, h = 2, K1 = 100, K2 = 40)
+
+# Initial conditions
+N0 <- c(50, 5)
+
+# Time definition
+t.values <- seq(0, 50)
+
+# Solve the LV.type3 model
+lv3_out <- ode(N0, t.values, LV.type3, params)
+
+# Plot phase plane for LV.type3
+plot(lv3_out[, 2], lv3_out[, 3], type = 'l', lty = 1, lwd = 2, 
+     xlab = 'Prey abundance', ylab = 'Predator abundance',
+     main = 'Phase Plane', col = 'black')
+
+# Function to calculate prey isocline
+prey_isocline <- function(N1, params) {
+  with(as.list(params), {
+    return(r1 * N1 * (1 - N1 / K1))
+  })
+}
+
+# Function to calculate predator isocline
+predator_isocline <- function(N1, params) {
+  with(as.list(params), {
+    return(((alpha21 * N1^h) / (r2 * (1 + alpha12 * th * N1^h))))
+  })
+}
+
+# Calculate isocline values
+prey_isocline_values <- prey_isocline(lv3_out[, 2], params)
+predator_isocline_values <- predator_isocline(lv3_out[, 2], params)
+
+# Add prey isocline to plot
+lines(lv3_out[, 2], prey_isocline_values, col = 'blue', lty = 2)
+
+# Add predator isocline to plot
+lines(lv3_out[, 2], predator_isocline_values, col = 'red', lty = 2)
+
+# Add legend for isoclines
+legend('topright', c('Prey Isocline', 'Predator Isocline'), 
+       lty = 2, lwd = 2, col = c('blue', 'red'))
+
+# model 3
+
+
+
+
+# model 3 phase plane 
+
+# Define the LV.type3 model function
+LV.type3 <- function(times, N0, params){
+  N0[N0 < 10^-8] <- 0
+  N1 <- N0[1]
+  N2 <- N0[2]
+  with(as.list(params), {
+    dN1.dt <- r1 * N1 * (1 - N1 / K1) - ((alpha12 * N1^h * N2) / (1 + alpha12 * th * N1^h)) + ri
+    dN2.dt <- ((((alpha21 * N1^h * N2) / (1 + alpha12 * th * N1^h)) + r2 * N2) * (1 - N2 / K2)) - rc
+    return(list(c(dN1.dt, dN2.dt)))
+  })
+}
+
+# Parameters
+params <- c(r1 = 0.8, r2 = 0.1, alpha12 = 0.6, alpha21 = 0.4, th = 0.01, 
+            h = 2, K1 = 100, K2 = 40, ri = 0, rc = 0)
+
+# Initial conditions
+N0 <- c(50, 5)
+
+# Definition of time
+t.values <- seq(0, 50)
+
+# Solve the LV.type3 model
+lv3_out <- ode(N0, t.values, LV.type3, params)
+
+# Plot phase plane for LV.type3
+plot(lv3_out[, 2], lv3_out[, 3], type = 'l', lty = 1, lwd = 2, 
+     xlab = 'Prey abundance (N1)', ylab = 'Predator abundance (N2)',
+     main = 'Phase Plane', col = 'black')
+
+# Function to calculate prey isocline
+prey_isocline <- function(N1, params) {
+  with(as.list(params), {
+    return(r1 * N1 * (1 - N1 / K1))
+  })
+}
+
+# Function to calculate predator isocline
+predator_isocline <- function(N1, params) {
+  with(as.list(params), {
+    return(((alpha21 * N1^h) / (r2 * (1 + alpha12 * th * N1^h))))
+  })
+}
+
+# Calculate isocline values
+prey_isocline_values <- prey_isocline(lv3_out[, 2], params)
+predator_isocline_values <- predator_isocline(lv3_out[, 2], params)
+
+# Add prey isocline to plot
+lines(lv3_out[, 2], prey_isocline_values, col = 'blue', lty = 2)
+
+# Add predator isocline to plot
+lines(lv3_out[, 2], predator_isocline_values, col = 'red', lty = 2)
+
+# Add legend for isoclines
+legend('topright', c('Prey Isocline', 'Predator Isocline'), 
+       lty = 2, lwd = 2, col = c('blue', 'red'))
+
+
+###############################################################################
+
+
+###############################################################################
+
+# Figure 6 code 
+
+# Model 3: 
+
+# Definition of the model
+LV.type3 <- function(times, N0, params){
+  N0[N0 < 10^-8] <- 0
+  N1 <- N0[1]
+  N2 <- N0[2]
+  with(as.list(params), {
+    dN1.dt <- r1*N1*(1-N1/K1)-((alpha12*N1^h*N2)/(1+alpha12*th*N1^h))+ri
+    dN2.dt <- ((((alpha21*N1^h*N2)/(1+alpha12*th*N1^h))+r2*N2)*(1-N2/K2))-rc
+    return(list(c(dN1.dt, dN2.dt)))
+  })
+}
+
+# Define the LV.type3 function and other initial code...
+
+# Parameters for the first simulation rc = 1 
+params1 <- c(r1 = 0.8, r2 = 0.1, alpha12 = 0.6, alpha21 = 0.4, th = 0.01, 
+             h = 2, K1 = 100, K2 = 40, ri = 0, rc = 1)
+
+# Parameters for the second simulation rc = 2 
+# change this parameter (rc= 2, 3, 4, 5, 10) for figure 6.
+params2 <- c(r1 = 0.8, r2 = 0.1, alpha12 = 0.6, alpha21 = 0.4, th = 0.01, 
+             h = 2, K1 = 100, K2 = 40, ri = 0, rc = 2)
+
+# Simulate the continuous time dynamics using the ode for both sets of parameters
+type3.out1 <- ode(N0, t.values, LV.type3, params1)
+type3.out2 <- ode(N0, t.values, LV.type3, params2)
+
+# Plot the results on one graph
+matplot(t.values, type3.out1[,2], type = 'l', lty = 1, lwd = 2, 
+        ylab='Abundance (n)', xlab='Time (y)', ylim = c(0, 100), col = 'blue')
+lines(t.values, type3.out2[,3], type = 'l', lty = 1, lwd = 2, col = 'red')
+
+# Add legend
+legend('topright', c('Prey', 'Predator'), lty = 1, lwd = 2, col = c('blue', 'red'))
+
+# Add a horizontal line at y = 2 - extinction threshold
+abline(h = 2, lty = 2)
+
+# Add text to specify rc value (2, 3, 4, 5, 10)
+text(5, 98, "rc = 2")
+
+###############################################################################
+# END
+###############################################################################
