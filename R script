@@ -174,7 +174,6 @@ lines(lv3_out[,2], predator_isocline_values, col = 'red', lty = 2)
 legend('topright', c('Prey Isocline', 'Predator Isocline'), 
        lty = 2, lwd = 2, col = c('blue', 'red'))
 
-
 # model 2
 
 # Define the LV.type3 model function
@@ -236,9 +235,6 @@ legend('topright', c('Prey Isocline', 'Predator Isocline'),
 
 # model 3
 
-
-
-
 # model 3 phase plane 
 
 # Define the LV.type3 model function
@@ -298,7 +294,6 @@ lines(lv3_out[, 2], predator_isocline_values, col = 'red', lty = 2)
 # Add legend for isoclines
 legend('topright', c('Prey Isocline', 'Predator Isocline'), 
        lty = 2, lwd = 2, col = c('blue', 'red'))
-
 
 ###############################################################################
 
