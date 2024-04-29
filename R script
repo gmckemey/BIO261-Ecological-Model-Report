@@ -1,5 +1,6 @@
 # BIO 261 ECOLOGICAL MODEL REPORT R SCRIPT
-#
+# created in R version 4.3.1 
+# 
 # 2-species predator-prey Lotka-Volterra model, Functional Response III
 #
 # in case you don’t have the solver library installed:
@@ -301,6 +302,54 @@ legend('topright', c('Prey Isocline', 'Predator Isocline'),
 
 ###############################################################################
 
+# attack rate graph 
+
+# Set 1: LV Model
+LV.type3 <- function(N1, N2, params){
+  with(as.list(params), {
+    return((alpha12 * N1^h * N2) / (1 + alpha12 * th * N1^h))
+  })
+}
+
+# Set 2: Population Growth Function
+r <- -0.1 # Intrinsic growth rate
+K <- 40 # Carrying capacity
+n <- seq(0, 1.5*K, length.out = 101) # Vector of population sizes
+params_set2 <- list(alpha12 = 0.6, alpha21 = 0.4, th = 0.01, h = 2) # Parameters for Set 2
+
+# Calculate attack rate for Set 1
+attack_rate <- LV.type3(n, N2 = 5, params = params_set2)
+
+# Plot attack rate against prey N1
+plot(n, attack_rate, type = "l", lwd = 2,
+     xlab = "Prey abundance (N1)", ylab = "Attack rate",
+     main = "Attack Rate vs Prey Abundance")
+
+# Define the LV.type3 model function
+LV.type3 <- function(times, N0, params){
+  N0[N0 < 10^-8] <- 0
+  N1 <- N0[1]
+  N2 <- N0[2]
+  with(as.list(params), {
+    attack_rate <- (alpha12 * N1^h * N2) / (1 + alpha12 * th * N1^h)
+    return(attack_rate)
+  })
+}
+
+# Parameters
+params <- c(r1 = 0.8, d2 = 0.1, alpha12 = 0.6, alpha21 = 0.4, th = 0.01, h = 2)
+
+# Prey abundance values
+N1_values <- seq(0, 100, by = 1)
+
+# Calculate attack rate for each value of prey abundance
+attack_rate_values <- sapply(N1_values, function(N1) {
+  LV.type3(NULL, c(N1, N0[2]), params)
+})
+
+# Plot attack rate against prey abundance
+plot(N1_values, attack_rate_values, type = 'l', 
+     xlab = 'Prey abundance (N1)', ylab = 'Attack rate')
 
 ###############################################################################
 
